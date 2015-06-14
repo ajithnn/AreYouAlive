@@ -1,0 +1,56 @@
+<html>
+	<head>
+		<title>Are You Alive</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+		<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+		<script src="/socket.io/socket.io.js"></script>
+		<script type="text/javascript" src="/static/client.js"></script>
+	</head>
+	<body>
+		<div class="container-float">
+			<div class="row">
+				<div class="col-lg-2 col-md-2 col-xs-1 col-sm-1"></div>
+				<div class="col-lg-8 col-md-8 col-xs-10 col-sm-10">
+					<div id="login" class="form-group center-block">
+						<label for="username">User Name: </label>
+						<input class="form-control" name="username" id="username" type="text" /></br>
+						<label for="password">Password: </label>
+						<input name="password" class="form-control" id="password" type="password" /></br>
+						<button id="btnSubmit" class="btn btn-success">Submit</button>
+					</div>
+					<div id="UrlForm" style="display:none;" class="form-group center-block">
+						URL:
+						<input class="form-control" name="url" type="text" /></br>
+						URL:
+						<input class="form-control" name="url" type="text" /></br>
+						URL:
+						<input class="form-control" name="url" type="text" /></br>
+						URL:
+						<input class="form-control" name="url" type="text" /></br>
+						<button id="urlSubmit" class="btn btn-success">Submit</button>
+					</div>
+					<div id="SignUp" style="display:none;" class="form-group center-block">
+						<label for="username">User Name: </label>
+						<input class="form-control" name="Signusername" type="text" />
+						<label for="password">Password: </label>
+						<input class="form-control" name="Signpassword" type="password" />
+						<label for="question">Security Question: </label>
+						<input class="form-control" name="question" type="text" />
+						<label for="answer">Answer: </label>
+						<input class="form-control" name="answer" type="text" />
+						<button id="SignUpSubmit" class="btn btn-success">SignUp</button>
+					</div>
+					<div>
+						<a id="showSignup" href="#" style="padding:5px;">SignUp</a>
+						<a id="showLogin" href="#" style="padding:5px;">Login</a>
+						<a id="showLogout" href="#" style="padding:5px;">Logout</a>
+					</div>
+					<div id="StatusTable">
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-2 col-md-2 col-xs-1 col-sm-1"></div>
+		</div>
+	</body>
+</html>
