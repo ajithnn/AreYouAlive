@@ -40,6 +40,7 @@ google.load("visualization", "1", {
     packages: ["table"]
 });
 google.setOnLoadCallback(InitAllTable);
+var Server = "http://glacial-dusk-6086.herokuapp.com/";
 $(document).ready(function() {
     var myUserName;
     var Socket;
@@ -58,7 +59,7 @@ $(document).ready(function() {
         var username = $("#username").val();
         var password = $("#password").val();
         $.ajax({
-            url: "http://localhost:7000/authenticate",
+            url: "http://glacial-dusk-6086.herokuapp.com/authenticate",
             type: "POST",
             data: {
                 'username': username,
@@ -102,7 +103,7 @@ $(document).ready(function() {
         };
         if (cont) {
             $.ajax({
-                url: "http://localhost:7000/url",
+                url: "http://glacial-dusk-6086.herokuapp.com/url",
                 type: "POST",
                 data: JSON.stringify(dataToSend),
                 headers: {
@@ -141,7 +142,7 @@ $(document).ready(function() {
             'SecurityA': answer
         };
         $.ajax({
-            url: "http://localhost:7000/signup",
+            url: "http://glacial-dusk-6086.herokuapp.com/signup",
             type: "POST",
             data: dataToSend,
             success: function(data) {
@@ -161,7 +162,7 @@ $(document).ready(function() {
     });
     $("#showLogout").click(function() {
         $.ajax({
-            url: "http://localhost:7000/logout/" + myUserName,
+            url: "http://glacial-dusk-6086.herokuapp.com/logout/" + myUserName,
             type: "GET",
             success: function(data) {
                 $("#SignUp").hide();
@@ -184,7 +185,7 @@ $(document).ready(function() {
 
     function HasURLs(username) {
         $.ajax({
-            url: "http://localhost:7000/Hasurl/" + username,
+            url: "http://glacial-dusk-6086.herokuapp.com/Hasurl/" + username,
             type: "GET",
             headers: {
                 'Authorization': 'Bearer ' + window.sessionStorage.token
