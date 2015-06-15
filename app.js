@@ -58,7 +58,7 @@ app.use('/Hasurl', expressJwt({
     secret: "ASDFEDsfdsafgsgtERFDSscsdgsdcv"
 }));
 
-app.use(bodyParser.json());
+app.use(bodyParser.json({strict: false}));
 app.use(bodyParser.urlencoded({
     extended: false
 }));
@@ -105,13 +105,14 @@ app.post('/signup', function(req, res) {
 app.post('/url', function(req, res) {
     try {
         if (CurrentUsers[req.body.username].isLoggedIn) {
-            CurrentUsers[req.body.username].urls = req.body["urls[]"];
+            CurrentUsers[req.body.username].urls = req.body["urls"];
             CurrentUsers[req.body.username].curStatus = {};
             fs.readFile('Users.txt', {
                 encoding: 'utf8'
             }, function(err, data) {
                 var usersData = JSON.parse(data);
-                usersData[req.body.username]["urls"] = req.body["urls[]"];
+                usersData[req.body.username]["urls"] = req.body["urls"];
+                console.log(typeof req.body["urls"]);
                 fs.writeFile('Users.txt', JSON.stringify(usersData), function(err) {
                     if (err) {
                         res.sendStatus(500);

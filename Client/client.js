@@ -104,9 +104,10 @@ $(document).ready(function() {
             $.ajax({
                 url: "http://localhost:7000/url",
                 type: "POST",
-                data: dataToSend,
+                data: JSON.stringify(dataToSend),
                 headers: {
-                    'Authorization': 'Bearer ' + window.sessionStorage.token
+                    'Authorization': 'Bearer ' + window.sessionStorage.token,
+                    'content-type':'application/json'
                 },
                 success: function(data) {
                     $('#login').hide();
