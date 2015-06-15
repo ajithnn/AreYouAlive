@@ -1,3 +1,41 @@
+//-------------Object.keys PolyFill----------------------------
+if (!Object.keys) {
+  Object.keys = (function () {
+    'use strict';
+    var hasOwnProperty = Object.prototype.hasOwnProperty,
+        hasDontEnumBug = !({toString: null}).propertyIsEnumerable('toString'),
+        dontEnums = [
+          'toString',
+          'toLocaleString',
+          'valueOf',
+          'hasOwnProperty',
+          'isPrototypeOf',
+          'propertyIsEnumerable',
+          'constructor'
+        ],
+        dontEnumsLength = dontEnums.length;
+    return function (obj) {
+      if (typeof obj !== 'object' && (typeof obj !== 'function' || obj === null)) {
+        throw new TypeError('Object.keys called on non-object');
+      }
+      var result = [], prop, i;
+      for (prop in obj) {
+        if (hasOwnProperty.call(obj, prop)) {
+          result.push(prop);
+        }
+      }
+      if (hasDontEnumBug) {
+        for (i = 0; i < dontEnumsLength; i++) {
+          if (hasOwnProperty.call(obj, dontEnums[i])) {
+            result.push(dontEnums[i]);
+          }
+        }
+      }
+      return result;
+    };
+  }());
+}
+//--------------------------------------------------------------
 google.load("visualization", "1", {
     packages: ["table"]
 });
@@ -31,6 +69,7 @@ $(document).ready(function() {
                 myUserName = username;
                 $("#login").hide();
                 $("#UrlForm").show();
+                HasURLs(myUserName);
             },
             error: function(err) {
                 if (err.status == 401) {
@@ -48,7 +87,9 @@ $(document).ready(function() {
         var cont = true;
         var urlexp = new RegExp('(http|ftp|https):\/\/.*');
         $("input[name=url]").each(function() {
-            if (urlexp.test($(this).val())) {
+            if ($(this).val() == "") {
+                console.log("Blank URL");
+            } else if (urlexp.test($(this).val())) {
                 urls.push($(this).val());
             } else {
                 alert("URL format should have http:// or https:// prefix.");
@@ -71,10 +112,9 @@ $(document).ready(function() {
                     $('#login').hide();
                     $("#SignUp").hide();
                     $("#UrlForm").hide();
-                    Socket = io.connect(window.location.origin, {
-                        query: "username=" + myUserName
-                    });
-                    SetSocketListener(Socket);
+                    if (!Socket) {
+                        StartSocket();
+                    }
                 },
                 error: function(err) {
                     if (err.status == 401) {
@@ -126,8 +166,10 @@ $(document).ready(function() {
                 $("#SignUp").hide();
                 $("#UrlForm").hide();
                 $("#login").show();
+                Socket.disconnect();
                 TableChartForStatus.clearChart();
-                DataTableForStatus.removeRows(0,DataTableForStatus.getNumberOfRows());
+                DataTableForStatus.removeRows(0, DataTableForStatus.getNumberOfRows());
+                location.reload();
             },
             error: function(err) {
                 if (err.status == 500) {
@@ -138,6 +180,36 @@ $(document).ready(function() {
             }
         });
     });
+
+    function HasURLs(username) {
+        $.ajax({
+            url: "http://localhost:7000/Hasurl/" + username,
+            type: "GET",
+            headers: {
+                'Authorization': 'Bearer ' + window.sessionStorage.token
+            },
+            success: function(data) {
+                for (i in data["url"]) {
+                    $("#" + i).val(data["url"][i]);
+                }
+                StartSocket();
+            },
+            error: function(err) {
+                if (err.status == 500) {
+                    console.log("Not Fund URLs");
+                } else {
+                    console.log(err);
+                }
+            }
+        });
+    }
+
+    function StartSocket() {
+        Socket = io.connect(window.location.origin, {
+            query: "username=" + myUserName
+        });
+        SetSocketListener(Socket);
+    }
 
     function SetSocketListener(Socket) {
         Socket.on("CurrentStatus", function(data) {
@@ -161,10 +233,13 @@ $(document).ready(function() {
         formatter.addRange(199, 201, 'white', 'green');
         formatter.addRange(-1, 1, 'white', 'red');
         formatter.format(DataTableForStatus, 1);
-        setTimeout(function(){TableChartForStatus.draw(DataTableForStatus, {
-            showRowNumber: false,
-            allowHtml: true
-        });},100);
+        console.log(DataTableForStatus.getNumberOfRows());
+        setTimeout(function() {
+            TableChartForStatus.draw(DataTableForStatus, {
+                showRowNumber: false,
+                allowHtml: true
+            });
+        }, 100);
     }
 });
 

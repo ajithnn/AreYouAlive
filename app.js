@@ -50,8 +50,11 @@ fs.exists('Users.txt', function(exists) {
     }
 });
 //-----------------------App Middleware------------------------------
-app.use('/static',express.static(__dirname + '/Client'));
+app.use('/static', express.static(__dirname + '/Client'));
 app.use('/url', expressJwt({
+    secret: "ASDFEDsfdsafgsgtERFDSscsdgsdcv"
+}));
+app.use('/Hasurl', expressJwt({
     secret: "ASDFEDsfdsafgsgtERFDSscsdgsdcv"
 }));
 
@@ -81,8 +84,8 @@ app.post('/signup', function(req, res) {
                 newUserObj['Password'] = crypto.createHash('sha256').update(req.body.password).digest('hex');
                 newUserObj['SecurityQuestion'] = req.body.SecurityQ;
                 newUserObj['SecurityAnswer'] = crypto.createHash('sha256').update(req.body.SecurityA).digest('hex');
+                newUserObj['urls'] = [];
                 users[req.body.username] = newUserObj;
-                console.log(users);
                 fs.writeFile('Users.txt', JSON.stringify(users), function(err) {
                     if (err) {
                         res.sendStatus(500);
@@ -103,13 +106,49 @@ app.post('/url', function(req, res) {
     try {
         if (CurrentUsers[req.body.username].isLoggedIn) {
             CurrentUsers[req.body.username].urls = req.body["urls[]"];
-            res.sendStatus(200);
+            CurrentUsers[req.body.username].curStatus = {};
+            fs.readFile('Users.txt', {
+                encoding: 'utf8'
+            }, function(err, data) {
+                var usersData = JSON.parse(data);
+                usersData[req.body.username]["urls"] = req.body["urls[]"];
+                fs.writeFile('Users.txt', JSON.stringify(usersData), function(err) {
+                    if (err) {
+                        res.sendStatus(500);
+                    }
+                    console.log('It\'s saved!');
+                    res.sendStatus(200);
+                });
+            });
         } else {
             res.sendStatus(401);
         }
     } catch (err) {
         res.sendStatus(500);
     }
+});
+
+app.get('/Hasurl/:username', function(req, res) {
+    var username = req.params.username;
+    fs.readFile('Users.txt', {
+        encoding: 'utf8'
+    }, function(err, data) {
+        if (err) {
+            res.sendStatus(500);
+        }
+        try {
+            var usersData = JSON.parse(data);
+            var CurrentUrls = usersData[username]["urls"];
+            if (CurrentUrls.length > 0) {
+                CurrentUsers[username].urls = CurrentUrls;
+                res.json({
+                    url: CurrentUrls
+                });
+            }
+        } catch (err) {
+            res.sendStatus(500);
+        }
+    });
 });
 
 app.get('/logout/:username', function(req, res) {
@@ -171,7 +210,7 @@ io.on('connection', function(socket) {
     CurrentUsers[handshakeData["_query"]["username"]].RunningID = setInterval(function() {
         CurrentUsers[handshakeData["_query"]["username"]].CallUrls(SetEmit);
     }, 2000);
-    socket.on('disconnect', function(){
+    socket.on('disconnect', function() {
         clearInterval(CurrentUsers[handshakeData["_query"]["username"]].RunningID);
         CurrentUsers[handshakeData["_query"]["username"]].isLoggedIn = false;
         console.log(CurrentUsers[handshakeData["_query"]["username"]]);
