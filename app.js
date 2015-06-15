@@ -218,4 +218,4 @@ io.on('connection', function(socket) {
     });
 });
 //-------------------------------------------------------------------------------------------
-server.listen(7000);
+server.listen(process.env.PORT||7000);
